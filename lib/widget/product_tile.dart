@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../model/product.dart';
 
 class ProductTile extends StatelessWidget {
@@ -40,45 +39,60 @@ class ProductTile extends StatelessWidget {
           spacing: 0,
           alignment: WrapAlignment.spaceAround,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: FittedBox(
-                child: Text(
-                  product.title!,
-                  maxLines: 1,
-                  style: Theme.of(context)
-                      .textTheme
-                      .headline2!
-                      .copyWith(fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-            Text.rich(
-              product.desc!,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: OutlinedButton(
-                child: purchased
-                    ? const Text('Remove from cart')
-                    : const Text('Add to cart'),
-                style: ButtonStyle(
-                  foregroundColor:
-                      MaterialStateProperty.resolveWith(getButtonColor),
-                  side: MaterialStateProperty.resolveWith(getButtonSide),
-                ),
-                onPressed: purchased ? onRemoveFromCart : onAddToCart,
-              ),
-            ),
-            Image.asset(
-              product.pictureUrl!,
-            ),
+            _buildTitleText(context),
+            _buildDescText(),
+            _buildPurchButton(),
+            _buildImage(),
           ],
         ));
+  }
+
+  Image _buildImage() {
+    return Image.asset(
+      product.pictureUrl!,
+    );
+  }
+
+  Padding _buildPurchButton() {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: OutlinedButton(
+        child: purchased
+            ? const Text('Remove from cart')
+            : const Text('Add to cart'),
+        style: ButtonStyle(
+          foregroundColor: MaterialStateProperty.resolveWith(getButtonColor),
+          side: MaterialStateProperty.resolveWith(getButtonSide),
+        ),
+        onPressed: purchased ? onRemoveFromCart : onAddToCart,
+      ),
+    );
+  }
+
+  Text _buildDescText() {
+    return Text.rich(
+      product.desc!,
+      textAlign: TextAlign.center,
+      style: const TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+    );
+  }
+
+  Padding _buildTitleText(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: FittedBox(
+        child: Text(
+          product.title!,
+          maxLines: 1,
+          style: Theme.of(context)
+              .textTheme
+              .headline2!
+              .copyWith(fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
   }
 }

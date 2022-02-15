@@ -1,5 +1,4 @@
 import '../data/fake_data.dart';
-
 import '../model/product.dart';
 
 class Server {

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:inherited_widget_beginning/main.dart';
-import 'package:inherited_widget_beginning/widget/cart_icon.dart';
-import '../base/server.dart';
 
+import '../base/server.dart';
+import '../main.dart';
 import 'product_tile.dart';
 
 class ProductList extends StatefulWidget {
