@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../main.dart';
+
 class ShoppingCartIcon extends StatefulWidget {
   const ShoppingCartIcon({Key? key}) : super(key: key);
 
@@ -19,6 +21,7 @@ class ShoppingCartIconState extends State<ShoppingCartIcon> {
 
   @override
   Widget build(BuildContext context) {
+    final Set<String> itemsInCart = AppStateScope.of(context).itemsInCard;
     final bool hasPurchase = itemsInCart.isNotEmpty;
     return Stack(
       alignment: Alignment.center,

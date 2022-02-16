@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-
+import 'package:inherited_widget_beginning/model/app_state.dart';
 import 'base/server.dart';
+import 'screen/store_page.dart';
 import 'widget/cart_icon.dart';
 import 'widget/product_list.dart';
 
-final GlobalKey<ShoppingCartIconState> shoppingCartKey =
-    GlobalKey<ShoppingCartIconState>();
-final GlobalKey<ProductListState> productListKey =
-    GlobalKey<ProductListState>();
+// final GlobalKey<ShoppingCartIconState> shoppingCartKey =
+//     GlobalKey<ShoppingCartIconState>();
+// final GlobalKey<ProductListState> productListKey =
+//     GlobalKey<ProductListState>();
 void main() => runApp(const App());
 
 class App extends StatelessWidget {
@@ -17,98 +18,90 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: title,
-      home: const StorePage(),
+    return AppStateWidget(
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: title,
+        home: const StorePage(),
+      ),
     );
   }
 }
 
-class StorePage extends StatefulWidget {
-  const StorePage({Key? key}) : super(key: key);
+class AppStateScope extends InheritedWidget {
+  const AppStateScope(this.data, {Key? key, required this.child})
+      : super(key: key, child: child);
 
-  @override
-  _StorePageState createState() => _StorePageState();
-}
+  final Widget child;
+  final AppState data;
 
-class _StorePageState extends State<StorePage> {
-  final TextEditingController _controller = TextEditingController();
-  final FocusNode _focusNode = FocusNode();
-  bool _inSearch = false;
-
-  void _toogleSearch() {
-    setState(() {
-      _inSearch = !_inSearch;
-    });
-    _controller.clear();
-    productListKey.currentState!.productList = Server.getProductList();
+  static AppState of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<AppStateScope>()!.data;
   }
 
-  void _handleSearch() {
-    // _focusNode.unfocus();
-    final String filter = _controller.text;
-    productListKey.currentState!.productList =
-        Server.getProductList(filter: filter);
+  @override
+  bool updateShouldNotify(AppStateScope oldWidget) {
+    return data != oldWidget.data;
+  }
+}
+
+class AppStateWidget extends StatefulWidget {
+  const AppStateWidget({required this.child, Key? key}) : super(key: key);
+
+  final Widget child;
+
+  static AppStateWidgetState of(BuildContext context) {
+    return context.findAncestorStateOfType<AppStateWidgetState>()!;
+  }
+
+  @override
+  AppStateWidgetState createState() => AppStateWidgetState();
+}
+
+class AppStateWidgetState extends State<AppStateWidget> {
+  AppState _data = AppState(
+    productList: Server.getProductList(),
+  );
+
+  void setProductList(List<String> newProductList) {
+    if (newProductList != _data.productList) {
+      setState(() {
+        _data = _data.copyWith(
+          productList: newProductList,
+        );
+      });
+    }
+  }
+
+  void addToCart(String id) {
+    if (!_data.itemsInCard.contains(id)) {
+      final Set<String> newItemsInCart = Set<String>.from(_data.itemsInCard);
+      newItemsInCart.add(id);
+      setState(() {
+        _data = _data.copyWith(
+          itemsInCard: newItemsInCart,
+        );
+      });
+    }
+  }
+
+  void removeFromCart(String id) {
+    if (_data.itemsInCard.contains(id)) {
+      final Set<String> newItemsInCart = Set<String>.from(_data.itemsInCard);
+      newItemsInCart.remove(id);
+      setState(() {
+        _data = _data.copyWith(
+          itemsInCard: newItemsInCart,
+        );
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // appBar: AppBar(),
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            leading: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Image.network(
-                "https://cdn-icons-png.flaticon.com/512/2592/2592226.png",
-                fit: BoxFit.cover,
-              ),
-            ),
-            title: _inSearch
-                ? TextField(
-                    onChanged: (value) => _handleSearch(),
-                    autofocus: false,
-                    focusNode: _focusNode,
-                    controller: _controller,
-                    onSubmitted: (value) => _handleSearch(),
-                    decoration: InputDecoration(
-                      hintText: "Search",
-                      prefixIcon: IconButton(
-                        onPressed: _handleSearch,
-                        icon: const Icon(Icons.search),
-                      ),
-                      suffixIcon: IconButton(
-                        onPressed: _toogleSearch,
-                        icon: const Icon(Icons.close_rounded),
-                      ),
-                    ),
-                  )
-                : null,
-            actions: [
-              if (!_inSearch)
-                IconButton(
-                  onPressed: _toogleSearch,
-                  icon: const Icon(
-                    Icons.search,
-                    color: Colors.black,
-                  ),
-                ),
-              ShoppingCartIcon(
-                key: shoppingCartKey,
-              ),
-            ],
-            backgroundColor: Colors.white,
-            pinned: true,
-          ),
-          SliverToBoxAdapter(
-            child: ProductList(
-              key: productListKey,
-            ),
-          )
-        ],
-      ),
+    return AppStateScope(
+      _data,
+      child: widget.child,
     );
   }
 }

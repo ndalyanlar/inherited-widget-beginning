@@ -4,54 +4,67 @@ import '../base/server.dart';
 import '../main.dart';
 import 'product_tile.dart';
 
-class ProductList extends StatefulWidget {
+// class ProductList extends StatefulWidget {
+//   const ProductList({Key? key}) : super(key: key);
+
+//   @override
+//   State<ProductList> createState() => ProductListState();
+// }
+
+class ProductList extends StatelessWidget {
   const ProductList({Key? key}) : super(key: key);
 
-  @override
-  State<ProductList> createState() => ProductListState();
-}
+  // List<String> _prodList = Server.getProductList();
+  // List<String> get prodList => _prodList;
 
-class ProductListState extends State<ProductList> {
-  List<String> _prodList = Server.getProductList();
-  List<String> get prodList => _prodList;
+  // set productList(List<String> list) {
+  //   setState(() {
+  //     _prodList = list;
+  //   });
+  // }
 
-  set productList(List<String> list) {
-    setState(() {
-      _prodList = list;
-    });
+  // Set<String> _itemsInCard = <String>{};
+  // Set<String> get itemsInCard => _itemsInCard;
+
+  // set itemInCard(Set<String> icc) {
+  //   setState(() {
+  //     _itemsInCard = icc;
+  //   });
+  // }
+
+  // void _handleAddToCard(String id) {
+  //   _itemsInCard.add(id);
+  //   itemInCard = _itemsInCard;
+  //   shoppingCartKey.currentState!.itemsInCart = itemsInCard;
+  // }
+
+  void _handleAddToCard(String id, BuildContext context) {
+    AppStateWidget.of(context).addToCart(id);
   }
 
-  Set<String> _itemsInCard = <String>{};
-  Set<String> get itemsInCard => _itemsInCard;
+  // void _handleRemoveFromCart(String id) {
+  //   itemInCard = _itemsInCard..remove(id);
+  //   shoppingCartKey.currentState!.itemsInCart = itemsInCard;
+  // }
 
-  set itemInCard(Set<String> icc) {
-    setState(() {
-      _itemsInCard = icc;
-    });
+  void _handleRemoveFromCard(String id, BuildContext context) {
+    AppStateWidget.of(context).removeFromCart(id);
   }
 
-  void _handleAddToCard(String id) {
-    _itemsInCard.add(id);
-    itemInCard = _itemsInCard;
-    shoppingCartKey.currentState!.itemsInCart = itemsInCard;
-  }
-
-  void _handleRemoveFromCart(String id) {
-    itemInCard = _itemsInCard..remove(id);
-    shoppingCartKey.currentState!.itemsInCart = itemsInCard;
-  }
-
-  ProductTile _buildProductTile(String id) {
+  ProductTile _buildProductTile(String id, BuildContext context) {
     return ProductTile(
       product: Server.getProductById(id),
-      purchased: itemsInCard.contains(id),
-      onAddToCart: () => _handleAddToCard(id),
-      onRemoveFromCart: () => _handleRemoveFromCart(id),
+      purchased: AppStateScope.of(context).itemsInCard.contains(id),
+      onAddToCart: () => _handleAddToCard(id, context),
+      onRemoveFromCart: () => _handleRemoveFromCard(id, context),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: prodList.map(_buildProductTile).toList());
+    final List<String> prodList = AppStateScope.of(context).productList;
+    return Column(
+        children:
+            prodList.map((id) => _buildProductTile(id, context)).toList());
   }
 }
