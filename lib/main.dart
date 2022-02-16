@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:inherited_widget_beginning/model/app_state.dart';
 import 'base/server.dart';
 import 'screen/store_page.dart';
-import 'widget/cart_icon.dart';
-import 'widget/product_list.dart';
 
 // final GlobalKey<ShoppingCartIconState> shoppingCartKey =
 //     GlobalKey<ShoppingCartIconState>();
@@ -71,11 +69,13 @@ class AppStateWidgetState extends State<AppStateWidget> {
         );
       });
     }
+    return;
   }
 
   void addToCart(String id) {
     if (!_data.itemsInCard.contains(id)) {
       final Set<String> newItemsInCart = Set<String>.from(_data.itemsInCard);
+
       newItemsInCart.add(id);
       setState(() {
         _data = _data.copyWith(
@@ -83,6 +83,7 @@ class AppStateWidgetState extends State<AppStateWidget> {
         );
       });
     }
+    return;
   }
 
   void removeFromCart(String id) {
