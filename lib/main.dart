@@ -27,10 +27,9 @@ class App extends StatelessWidget {
 }
 
 class AppStateScope extends InheritedWidget {
-  const AppStateScope(this.data, {Key? key, required this.child})
+  const AppStateScope(this.data, {Key? key, required Widget child})
       : super(key: key, child: child);
 
-  final Widget child;
   final AppState data;
 
   static AppState of(BuildContext context) {
